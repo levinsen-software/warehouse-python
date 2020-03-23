@@ -9,7 +9,7 @@ This library implements limited functionality for interaction with a warehouse i
 ## Examples
 
 ```python
-import warehousePython as wh
+import warehouse as wh
 
 c = wh.Client("https://warehouse.local", wh.ApikeyAuth(APIKEY))
 

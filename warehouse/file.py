@@ -14,8 +14,7 @@ class WHFile():
         with requests.get('%s/files/%s' % (self.wh.url, self.id), auth=self.wh.auth) as r:
             return r.json()
     
-    def download(self, path=None):
-        print('%s/files/%s/download' % (self.wh.url, self.id))
+    def download(self, path=None, createDirs=False):
         with requests.get('%s/files/%s/download' % (self.wh.url, self.id), auth=self.wh.auth, stream=True) as r:
             r.raise_for_status()
             filename = r.headers['x-content-filename']
@@ -26,6 +25,9 @@ class WHFile():
                     filename = os.path.join(os.path.dirname(path), filename)
                 else:
                     filename = path
+                
+                if createDirs:
+                    os.makedirs(os.path.dirname(filename), exist_ok=True)
 
             print("Downloading file as %s" % filename)
             with open(filename + '.part', 'wb') as f:

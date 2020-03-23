@@ -112,8 +112,11 @@ class Client():
         return self._findBundles(q, sorting, limit)
     
     def findBundle(self, query, sorting):
-        return self.findBundles(query, sorting, 1)
-
+        try:
+            return self.findBundles(query, sorting, 1)[0]
+        except IndexError:
+            return None
+            
     def _findFiles(self, query, sorting=None, limit=0):
         if not sorting:
             sorting = Sorting(None, None, None)
@@ -157,4 +160,7 @@ class Client():
         return self._findFiles(q, sorting, limit)
 
     def findFile(self, query, sorting):
-        return self.findFiles(query, sorting, 1)
+        try:
+            return self.findFiles(query, sorting, 1)[0]
+        except IndexError:
+            return None

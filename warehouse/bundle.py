@@ -28,11 +28,14 @@ class WHBundle():
             q.append(self.wh.naturalQuery(query))
         elif type(query) is dict:
             for k, v in query.items():
-                q.append(self.strMatchesQuery(k, v))        
+                q.append(self.wh.strMatchesQuery(k, v))        
         else:
             raise ValueError('only str and dict are supported as query types')
-        print(self.wh.andQuery(q))
+
         return self.wh._findFiles(self.wh.andQuery(q), sorting, limit)
     
-    def findFile(self, query, sorting):
-        return findFiles(query, sorting, 1)
+    def findFile(self, query, sorting=None):
+        try:
+            return self.findFiles(query, sorting, 1)[0]
+        except IndexError:
+            return None

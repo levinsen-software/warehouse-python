@@ -52,7 +52,7 @@ class WHProject():
         q = self.wh.andQuery(items)
         return self.wh._findFiles(q, sorting, limit)
 
-    def findFile(self, query, sorting):
+    def findFile(self, query, sorting=None):
         try:
             return self.findFiles(query, sorting, 1)[0]
         except IndexError:

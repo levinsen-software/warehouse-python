@@ -1,0 +1,2 @@
+class WarehouseClientException(Exception):
+    pass

@@ -1,7 +1,9 @@
 import requests
-from . bundle import WHBundle
-from . file import WHFile
-from . sorting import Sorting
+from warehouse.bundle import WHBundle
+from warehouse.file import WHFile
+from warehouse.project import WHProject
+from warehouse.sorting import Sorting
+from warehouse.errors import *
 
 class UserCredentialsAuth():
     def __init__(self, username, password):
@@ -26,7 +28,6 @@ class ApikeyAuth():
     def __call__(self, r):
         r.headers['Authorization'] = 'apikey %s' % self.apikey
         return r
-
 
 class Client():
     def __init__(self, url, auth):
@@ -59,15 +60,18 @@ class Client():
     def file(self, id):
         return WHFile(self, id)
     
-    # def projects(self):
-    #     with requests.get('%s/organizations' % self.url, auth=self.auth) as r:
-    #         j = r.json()
-    #         projects = []
-    #         for o in j['organizations']:
-    #             for p in o['projects']:
-    #                 projects.append('%s/%s' % (o['organization_name'], p['project_name']))
+    def project(self, id):
+        return WHProject(self, id)
+    
+    def projects(self):
+        with requests.get('%s/organizations' % self.url, auth=self.auth) as r:
+            j = r.json()
+            _projects = []
+            for o in j['organizations']:
+                for p in o['projects']:
+                    _projects.append(self.project('%s/%s' % (o['organization_name'], p['project_name'])))
         
-    #         return projects
+            return _projects
     
     def _findBundles(self, query, sorting=None, limit=0):
         if not sorting:
@@ -90,6 +94,8 @@ class Client():
 
         bundles = []
         with requests.post('%s/search/keys' % self.url, auth=self.auth, json=q) as r:
+            if r.status_code < 200 or r.status_code >= 300:
+                raise WarehouseClientException('error searching: %s' % r.text)
             j = r.json()
 
             for b in j['results']:
@@ -116,7 +122,7 @@ class Client():
             return self.findBundles(query, sorting, 1)[0]
         except IndexError:
             return None
-            
+
     def _findFiles(self, query, sorting=None, limit=0):
         if not sorting:
             sorting = Sorting(None, None, None)

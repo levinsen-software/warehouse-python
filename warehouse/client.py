@@ -30,16 +30,21 @@ class ApikeyAuth():
         return r
 
 class Client():
-    def __init__(self, url, auth):
+    def __init__(self, url, auth, verify=True, cert=None):
         self.url = url
         self.auth = auth
+        self.session = requests.Session()
+
+        self.session.auth = auth
+        self.session.verify = verify
+        self.session.cert = cert
 
     def ping(self):
-        with requests.get('%s/ping' % self.url, auth=self.auth) as r:
+        with self.session.get('%s/ping' % self.url, auth=self.auth) as r:
             r.raise_for_status()
     
     def checkToken(self):
-        with requests.post('%s/checkToken' % self.url, auth=self.auth) as r:
+        with self.session.post('%s/checkToken' % self.url, auth=self.auth) as r:
             r.raise_for_status()
     
     def andQuery(self, items):
@@ -64,7 +69,7 @@ class Client():
         return WHProject(self, id)
     
     def projects(self):
-        with requests.get('%s/organizations' % self.url, auth=self.auth) as r:
+        with self.session.get('%s/organizations' % self.url) as r:
             j = r.json()
             _projects = []
             for o in j['organizations']:
@@ -93,7 +98,7 @@ class Client():
             q['limit'] = limit
 
         bundles = []
-        with requests.post('%s/search/keys' % self.url, auth=self.auth, json=q) as r:
+        with self.session.post('%s/search/keys' % self.url, json=q) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error searching: %s' % r.text)
             j = r.json()
@@ -117,7 +122,7 @@ class Client():
 
         return self._findBundles(q, sorting, limit)
     
-    def findBundle(self, query, sorting):
+    def findBundle(self, query, sorting=None):
         try:
             return self.findBundles(query, sorting, 1)[0]
         except IndexError:
@@ -143,7 +148,7 @@ class Client():
             q['limit'] = limit
 
         files = []
-        with requests.post('%s/search/keys' % self.url, auth=self.auth, json=q) as r:
+        with self.session.post('%s/search/keys' % self.url, json=q) as r:
             j = r.json()
 
             for f in j['results']:

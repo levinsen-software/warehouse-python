@@ -11,11 +11,11 @@ class WHBundle():
         return 'WHBundle(id=%s)' % self.id
 
     def getProperties(self):
-        with requests.get('%s/bundles/%s' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.get('%s/bundles/%s' % (self.wh.url, self.id)) as r:
             return r.json()
 
     def files(self):
-        with requests.get('%s/bundles/%s' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.get('%s/bundles/%s' % (self.wh.url, self.id)) as r:
             j = r.json()
             files = []
             for f in j['files']:
@@ -50,19 +50,19 @@ class WHBundle():
             else:
                 req.append({'assign': {'key': key, 'value': value}})
 
-        with requests.patch('%s/bundles/%s' % (self.wh.url, self.id), auth=self.wh.auth, json=req) as r:
+        with self.wh.session.patch('%s/bundles/%s' % (self.wh.url, self.id), json=req) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error updating properties: %s' % r.text)
 
             return r.json()
     
     def trash(self):
-        with requests.post('%s/bundles/%s/trash' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.post('%s/bundles/%s/trash' % (self.wh.url, self.id)) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error trashing bundle: %s' % r.text)
 
     def restore(self):
-        with requests.post('%s/bundles/%s/restore' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.post('%s/bundles/%s/restore' % (self.wh.url, self.id)) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error restoring bundle: %s' % r.text)
     
@@ -70,7 +70,7 @@ class WHBundle():
         headers = {}
         if name:
             headers['x-file-property'] = 'filename=%s' % name
-        with requests.post('%s/bundles/%s/files' % (self.wh.url, self.id), auth=self.wh.auth, data=f, headers=headers) as r:
+        with self.wh.session.post('%s/bundles/%s/files' % (self.wh.url, self.id), data=f, headers=headers) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error uploading file: %s' % r.text)
             

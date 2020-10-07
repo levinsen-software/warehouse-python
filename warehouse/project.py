@@ -59,7 +59,7 @@ class WHProject():
             return None
     
     def createBundle(self, params):
-        with requests.post('%s/projects/%s/bundles' % (self.wh.url, self.id.replace('/', '%2F')), auth=self.wh.auth, json=params) as r:
+        with self.wh.session.post('%s/projects/%s/bundles' % (self.wh.url, self.id.replace('/', '%2F')), json=params) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('returned error: %s' % r.text)
 

@@ -1,12 +1,13 @@
 from distutils.core import setup
+
 setup(
     name = 'warehouse-client',
     packages = ['warehouse'],
-    version = '1.0',
+    version = '1.0.1',
     license='MIT',
     description = 'Client library to interact with levinsen software warehouse artifact management system.',
-    maintainer = 'levinsen software',
-    maintainer_email = 'opensource@levinsen.software',
+    author = 'levinsen software',
+    author_email = 'opensource@levinsen.software',
     url = 'https://gitlab.com/levinsen-software/warehouse-python',
     install_requires=[
         'requests',

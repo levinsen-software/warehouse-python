@@ -11,7 +11,7 @@ class WHFile():
         return 'WHFile(id=%s)' % self.id
 
     def getProperties(self):
-        with requests.get('%s/files/%s' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.get('%s/files/%s' % (self.wh.url, self.id)) as r:
             return r.json()
     
     def updateProperties(self, props):
@@ -22,24 +22,24 @@ class WHFile():
             else:
                 req.append({'assign': {'key': key, 'value': value}})
 
-        with requests.patch('%s/files/%s' % (self.wh.url, self.id), auth=self.wh.auth, json=req) as r:
+        with self.wh.session.patch('%s/files/%s' % (self.wh.url, self.id), json=req) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error updating properties: %s' % r.text)
 
             return r.json()
     
     def trash(self):
-        with requests.post('%s/files/%s/trash' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.post('%s/files/%s/trash' % (self.wh.url, self.id)) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error trashing bundle: %s' % r.text)
 
     def restore(self):
-        with requests.post('%s/files/%s/restore' % (self.wh.url, self.id), auth=self.wh.auth) as r:
+        with self.wh.session.post('%s/files/%s/restore' % (self.wh.url, self.id)) as r:
             if r.status_code < 200 or r.status_code >= 300:
                 raise WarehouseClientException('error restoring bundle: %s' % r.text)
 
     def download(self, path=None, createDirs=False):
-        with requests.get('%s/files/%s/download' % (self.wh.url, self.id), auth=self.wh.auth, stream=True) as r:
+        with self.wh.session.get('%s/files/%s/download' % (self.wh.url, self.id), stream=True) as r:
             r.raise_for_status()
             filename = r.headers['x-content-filename']
 

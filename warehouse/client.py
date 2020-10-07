@@ -30,14 +30,13 @@ class ApikeyAuth():
         return r
 
 class Client():
-    def __init__(self, url, auth, verify=True, cert=None):
+    def __init__(self, url, auth, verify=True):
         self.url = url
         self.auth = auth
         self.session = requests.Session()
 
         self.session.auth = auth
         self.session.verify = verify
-        self.session.cert = cert
 
     def ping(self):
         with self.session.get('%s/ping' % self.url, auth=self.auth) as r:

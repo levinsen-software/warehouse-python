@@ -73,6 +73,9 @@ class Client():
             raise WarehouseClientException(
                 'Unknown server response: %d' % e.response.status_code) from e
 
+        except requests.RequestException as e:
+            raise WarehouseClientException('Connection error') from e
+
     @staticmethod
     def and_query(items):
         """Returns a warehouse and query"""

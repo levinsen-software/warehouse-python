@@ -1,0 +1,6 @@
+
+[BASIC]
+good-names=_,id,e,f,wh
+
+[MESSAGES CONTROL]
+disable=too-few-public-methods,duplicate-code

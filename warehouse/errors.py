@@ -1,2 +1,5 @@
+"""Error module"""
+
+
 class WarehouseClientException(Exception):
-    pass
+    """Exception thrown on warehouse related errors"""

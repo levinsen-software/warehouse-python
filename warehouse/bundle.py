@@ -105,5 +105,6 @@ class WHBundle():
     # Will be removed in future release
     getProperties = get_properties
     findFiles = find_files
+    findFile = find_file
     updateProperties = update_properties
     uploadFile = upload_file

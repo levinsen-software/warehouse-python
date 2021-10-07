@@ -23,6 +23,16 @@ class WHProject():
         except ValueError:
             return self.wh.equalsQuery('project.name', self.id)
 
+    def get_info(self):
+        """Returns a dictionary with project info"""
+        with self.wh.session.get('%s/projects/%s' % (
+            self.wh.url, self.id.replace('/', '%2F'))) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error getting project info: %s' % req.text)
+
+            return req.json()
+
     def find_bundles(self, query, sorting=None, limit=0):
         """Performs a search for bundles within this project"""
         items = [self.query_param()]

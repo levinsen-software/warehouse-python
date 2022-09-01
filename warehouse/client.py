@@ -7,6 +7,7 @@ This module contains the main client for warehouse communication.
 import requests
 from warehouse.bundle import WHBundle
 from warehouse.file import WHFile
+from warehouse.organization import WHOrganization
 from warehouse.project import WHProject
 from warehouse.sorting import Sorting
 from warehouse.errors import WarehouseClientException
@@ -225,6 +226,13 @@ class Client():
         except IndexError:
             return None
 
+    def create_organization(self, name):
+        with self.session.post('%s/organizations' % self.url, json={"name": name}) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException('returned error: %s' % req.text)
+            
+            json_res = req.json()
+            return WHOrganization(self, json_res['organization_id'])
     # Deprecated camelCase methods
     # Will be removed in future release
     checkToken = check_token

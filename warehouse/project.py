@@ -1,6 +1,8 @@
 """Project module"""
 import uuid
 
+from requests import delete
+
 from warehouse.bundle import WHBundle
 from warehouse.errors import WarehouseClientException
 
@@ -90,6 +92,13 @@ class WHProject():
                 raise WarehouseClientException('could not create bundle')
 
             return WHBundle(self.wh, bundle_id)
+    
+    def delete(self):
+        """Deletes the project"""
+        with self.wh.session.delete('%s/projects/%s' % (self.wh.url, self.id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error deleting project: %s' % req.text)
 
     # Deprecated camelCase methods
     # Will be removed in future release

@@ -1,14 +1,20 @@
 """Organization module"""
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 
 from warehouse.project import WHProject
 from warehouse.errors import WarehouseClientException
+
+if TYPE_CHECKING:
+    from warehouse.client import Client
 
 
 class WHOrganization():
     """Class representing a warehouse organization"""
 
-    def __init__(self, wh, organization_id):
+    def __init__(self, wh: Client, organization_id: str):
         self.wh = wh
         self.id = organization_id
 
@@ -41,7 +47,7 @@ class WHOrganization():
                     'error deleting organization: %s' % req.text)
 
     
-    def create_project(self, name):
+    def create_project(self, name: str):
         with self.wh.session.post('%s/organizations/%s/projects' % (self.wh.url, self.id), json={"name": name}) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException('returned error: %s' % req.text)

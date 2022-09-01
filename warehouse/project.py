@@ -1,16 +1,21 @@
 """Project module"""
-import uuid
+from __future__ import annotations
 
-from requests import delete
-
+from warehouse.file import WHFile
 from warehouse.bundle import WHBundle
 from warehouse.errors import WarehouseClientException
+from warehouse.sorting import Sorting
 
+import uuid
+from typing import Optional, Dict, Any, Union, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from warehouse.client import Client
 
 class WHProject():
     """Class representing a warehouse project"""
 
-    def __init__(self, wh, project_id):
+    def __init__(self, wh: Client, project_id: str):
         self.wh = wh
         self.id = project_id
 
@@ -35,49 +40,50 @@ class WHProject():
 
             return req.json()
 
-    def find_bundles(self, query, sorting=None, limit=0):
+    def find_bundles(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None, limit: int=0) -> List[WHBundle]:
         """Performs a search for bundles within this project"""
+        # pyright: reportUnnecessaryIsInstance=false
         items = [self.query_param()]
         if isinstance(query, str):
-            items.append(self.wh.naturalQuery(query))
+            items.append(Client.naturalQuery(query))
         elif isinstance(query, dict):
             for key, value in query.items():
-                items.append(self.wh.str_matches_query(key, value))
+                items.append(Client.str_matches_query(key, value))
         else:
             raise ValueError('only str and dict are supported as query types')
 
-        query_obj = self.wh.and_query(items)
+        query_obj = Client.and_query(items)
         return self.wh.internal_find_bundles(query_obj, sorting, limit)
 
-    def find_bundle(self, query, sorting=None):
+    def find_bundle(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None) -> Optional[WHBundle]:
         """Performs a search for a single bundle within this project"""
         try:
             return self.find_bundles(query, sorting, 1)[0]
         except IndexError:
             return None
 
-    def find_files(self, query, sorting=None, limit=0):
+    def find_files(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None, limit: int=0) -> List[WHFile]:
         """Performs a search for files within this project"""
         items = [self.query_param()]
         if isinstance(query, str):
-            items.append(self.wh.naturalQuery(query))
+            items.append(Client.naturalQuery(query))
         elif isinstance(query, dict):
             for key, value in query.items():
-                items.append(self.wh.strMatchesQuery(key, value))
+                items.append(Client.strMatchesQuery(key, value))
         else:
             raise ValueError('only str and dict are supported as query types')
 
-        query_obj = self.wh.andQuery(items)
+        query_obj = Client.andQuery(items)
         return self.wh.internal_find_files(query_obj, sorting, limit)
 
-    def find_file(self, query, sorting=None):
+    def find_file(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None) -> Optional[WHFile]:
         """Performs a search for a single file within this project"""
         try:
             return self.find_files(query, sorting, 1)[0]
         except IndexError:
             return None
 
-    def create_bundle(self, params):
+    def create_bundle(self, params: Dict[str, Any]) -> WHBundle:
         """Creates a bundle within this project, and returns the WHBundle object"""
         url = '%s/projects/%s/bundles' % (self.wh.url,
                                           self.id.replace('/', '%2F'))

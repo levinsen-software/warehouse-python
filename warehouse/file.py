@@ -1,36 +1,41 @@
 """File module"""
+from __future__ import annotations
 
 import os
 import shutil
 
 from warehouse.errors import WarehouseClientException
 
+from typing import Dict, Any, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from warehouse.client import Client
 
 class WHFile():
     """Class representing a single warehouse file"""
 
-    def __init__(self, wh, file_id):
+    def __init__(self, wh: Client, file_id: str):
         self.wh = wh
         self.id = file_id
 
     def __str__(self):
         return 'WHFile(id=%s)' % self.id
 
-    def get_properties(self):
+    def get_properties(self) -> Dict[str, Any]:
         """Returns the properties associated with this file"""
         with self.wh.session.get('%s/files/%s' % (self.wh.url, self.id)) as req:
             return req.json()
 
-    def update_properties(self, props):
+    def update_properties(self, props: Dict[str, Any]):
         """Update the file properties with the provided values"""
-        req = []
+        request_json: List[Dict[str, Any]] = []
         for key, value in props.items():
             if value is None:
-                req.append({'delete': {'key': key}})
+                request_json.append({'delete': {'key': key}})
             else:
-                req.append({'assign': {'key': key, 'value': value}})
+                request_json.append({'assign': {'key': key, 'value': value}})
 
-        with self.wh.session.patch('%s/files/%s' % (self.wh.url, self.id), json=req) as req:
+        with self.wh.session.patch('%s/files/%s' % (self.wh.url, self.id), json=request_json) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
                     'error updating properties: %s' % req.text)
@@ -51,7 +56,7 @@ class WHFile():
                 raise WarehouseClientException(
                     'error restoring bundle: %s' % req.text)
 
-    def download(self, path=None, create_dirs=False):
+    def download(self, path: Optional[str]=None, create_dirs: bool=False):
         """Download this file"""
         url = '%s/files/%s/download' % (self.wh.url, self.id)
         with self.wh.session.get(url, stream=True) as req:

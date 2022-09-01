@@ -1,10 +1,11 @@
 """Sorting module"""
 
+from typing import Optional
 
 class Sorting():
     """Object represents settings for sorting results"""
 
-    def __init__(self, sort, order, key):
+    def __init__(self, sort: Optional[str], order: Optional[str], key: Optional[str]):
         self.sort = sort
         self.order = order
         self.key = key

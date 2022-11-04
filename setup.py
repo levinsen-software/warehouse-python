@@ -15,7 +15,7 @@ setup(
     long_description=long_description,
     author='levinsen software',
     author_email='opensource@levinsen.software',
-    url='https://gitlab.com/levinsen-software/warehouse-python',
+    url='https://github.com/levinsen-software/warehouse-python',
     install_requires=[
         'requests',
     ],

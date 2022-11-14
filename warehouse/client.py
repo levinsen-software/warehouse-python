@@ -49,14 +49,25 @@ class ApikeyAuth():
         req.headers['Authorization'] = 'apikey %s' % self.apikey
         return req
 
+class TimeoutSession(requests.Session):
+    """Requests session override with Timeout handling"""
+    def __init__(self, connect_timeout, read_timeout):
+        self.connect_timeout = connect_timeout
+        self.read_timeout = read_timeout
+
+        super(TimeoutSession, self).__init__()
+
+    def request(self, *args, **kwargs):
+        kwargs.setdefault('timeout', (self.connect_timeout, self.read_timeout))
+        return super(TimeoutSession, self).request(*args, **kwargs)
 
 class Client():
     """Main client object for warehouse"""
 
-    def __init__(self, url: str, auth: Any, verify: bool=True):
+    def __init__(self, url: str, auth: Any, verify: bool=True, connect_timeout: float=10.0, read_timeout: float=600.0):
         self.url = url
         self.auth = auth
-        self.session = requests.Session()
+        self.session = TimeoutSession(connect_timeout, read_timeout)
 
         self.session.auth = auth
         self.session.verify = verify

@@ -101,10 +101,47 @@ class WHProject():
     
     def delete(self):
         """Deletes the project"""
-        with self.wh.session.delete('%s/projects/%s' % (self.wh.url, self.id)) as req:
+        with self.wh.session.delete('%s/projects/%s' % (self.wh.url, self.id.replace('/', '%2F'))) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
                     'error deleting project: %s' % req.text)
+    
+    def create_subscription(self) -> uuid.UUID:
+        """Subscribes to changes in the project"""
+        with self.wh.session.post('%s/projects/%s/subscriptions' % (self.wh.url,  self.id.replace('/', '%2F'))) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error creating subscription: %s' % req.text)
+        
+        return uuid.UUID(req.json().get('subscription_id'))
+    
+    def delete_subscription(self, subscription_id: uuid.UUID):
+        """Delete subscription"""
+        with self.wh.session.delete('%s/projects/%s/subscriptions/%s' % (self.wh.url,  self.id.replace('/', '%2F'), subscription_id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error deleting subscription: %s' % req.text)
+
+    def subscription_wait(self, subscription_id: uuid.UUID):
+        """Wait for events on the provided subscription"""
+        with self.wh.session.post('%s/projects/%s/subscriptions/%s' % (self.wh.url,  self.id.replace('/', '%2F'), subscription_id), timeout=None) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error polling subscription: %s' % req.text)
+        
+        return req.json()
+
+    def wait_events(self):
+        """Returns generator yielding events"""
+        subscription_id = self.create_subscription()
+        try:
+            while True:
+                try:
+                    yield self.subscription_wait(subscription_id)
+                except Exception as e:
+                    print(e)
+        finally:
+            self.delete_subscription(subscription_id)
 
     # Deprecated camelCase methods
     # Will be removed in future release

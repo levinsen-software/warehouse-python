@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name='warehouse-client',
     packages=['warehouse'],
-    version='1.0.7',
+    version='1.0.8',
     license='MIT',
     description='Client library to interact with levinsen software warehouse artifact management system.',
     long_description_content_type='text/markdown',

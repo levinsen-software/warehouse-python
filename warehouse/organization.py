@@ -2,19 +2,14 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
 
 from warehouse.project import WHProject
 from warehouse.errors import WarehouseClientException
 
-if TYPE_CHECKING:
-    from warehouse.client import Client
-
-
 class WHOrganization():
     """Class representing a warehouse organization"""
 
-    def __init__(self, wh: Client, organization_id: str):
+    def __init__(self, wh: 'Client', organization_id: str):
         self.wh = wh
         self.id = organization_id
 

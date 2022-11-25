@@ -7,15 +7,12 @@ from warehouse.errors import WarehouseClientException
 from warehouse.sorting import Sorting
 
 import uuid
-from typing import Optional, Dict, Any, Union, List, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from warehouse.client import Client
+from typing import Optional, Dict, Any, Union, List
 
 class WHProject():
     """Class representing a warehouse project"""
 
-    def __init__(self, wh: Client, project_id: str):
+    def __init__(self, wh: 'Client', project_id: str):
         self.wh = wh
         self.id = project_id
 
@@ -45,14 +42,14 @@ class WHProject():
         # pyright: reportUnnecessaryIsInstance=false
         items = [self.query_param()]
         if isinstance(query, str):
-            items.append(Client.naturalQuery(query))
+            items.append(self.wh.naturalQuery(query))
         elif isinstance(query, dict):
             for key, value in query.items():
-                items.append(Client.str_matches_query(key, value))
+                items.append(self.wh.str_matches_query(key, value))
         else:
             raise ValueError('only str and dict are supported as query types')
 
-        query_obj = Client.and_query(items)
+        query_obj = self.wh.and_query(items)
         return self.wh.internal_find_bundles(query_obj, sorting, limit)
 
     def find_bundle(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None) -> Optional[WHBundle]:
@@ -66,14 +63,14 @@ class WHProject():
         """Performs a search for files within this project"""
         items = [self.query_param()]
         if isinstance(query, str):
-            items.append(Client.naturalQuery(query))
+            items.append(self.wh.naturalQuery(query))
         elif isinstance(query, dict):
             for key, value in query.items():
-                items.append(Client.strMatchesQuery(key, value))
+                items.append(self.wh.strMatchesQuery(key, value))
         else:
             raise ValueError('only str and dict are supported as query types')
 
-        query_obj = Client.andQuery(items)
+        query_obj = self.wh.andQuery(items)
         return self.wh.internal_find_files(query_obj, sorting, limit)
 
     def find_file(self, query: Union[str, Dict[str, Any]], sorting: Optional[Sorting]=None) -> Optional[WHFile]:

@@ -6,15 +6,12 @@ import shutil
 
 from warehouse.errors import WarehouseClientException
 
-from typing import Dict, Any, List, Optional, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from warehouse.client import Client
+from typing import Dict, Any, List, Optional
 
 class WHFile():
     """Class representing a single warehouse file"""
 
-    def __init__(self, wh: Client, file_id: str):
+    def __init__(self, wh: 'Client', file_id: str):
         self.wh = wh
         self.id = file_id
 

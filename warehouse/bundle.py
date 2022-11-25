@@ -3,17 +3,15 @@ from __future__ import annotations
 
 from warehouse.errors import WarehouseClientException
 from warehouse.file import WHFile
+from warehouse.sorting import Sorting
 
-from typing import List, Union, Optional, Dict, Any, TYPE_CHECKING
+from typing import List, Union, Optional, Dict, Any
 
-if TYPE_CHECKING:
-    from warehouse.client import Client
-    from warehouse.sorting import Sorting
 
 class WHBundle():
     """Class representing a single warehouse bundle"""
 
-    def __init__(self, wh: Client, bundle_id: str):
+    def __init__(self, wh: 'Client', bundle_id: str):
         self.wh = wh
         self.id = bundle_id
 
@@ -48,7 +46,7 @@ class WHBundle():
         else:
             raise ValueError('only str and dict are supported as query types')
 
-        return self.wh.internal_find_files(Client.andQuery(query_obj), sorting, limit)
+        return self.wh.internal_find_files(self.wh.andQuery(query_obj), sorting, limit)
 
     def find_file(self, query: Dict[str, Any], sorting: Optional[Sorting]=None) -> Optional[WHFile]:
         """Performs a search for a single file"""

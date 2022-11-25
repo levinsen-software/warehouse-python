@@ -123,6 +123,10 @@ class Client():
     def project(self, project_id: str):
         """Returns a WHProject object with the provided ID"""
         return WHProject(self, project_id)
+    
+    def organization(self, organization_id: str):
+        """Returns a WHOrganization object with the provided ID"""
+        return WHOrganization(self, organization_id)
 
     def projects(self) -> List[WHProject]:
         """Returns a list of all accessible warehouse projects"""

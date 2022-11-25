@@ -44,14 +44,22 @@ class WHFile():
         with self.wh.session.post('%s/files/%s/trash' % (self.wh.url, self.id)) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
-                    'error trashing bundle: %s' % req.text)
+                    'error trashing file: %s' % req.text)
 
     def restore(self):
         """Restore this file from trash"""
         with self.wh.session.post('%s/files/%s/restore' % (self.wh.url, self.id)) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
-                    'error restoring bundle: %s' % req.text)
+                    'error restoring file: %s' % req.text)
+    
+    def delete(self):
+        """Permanently delete this file"""
+        with self.wh.session.delete('%s/files/%s' % (self.wh.url, self.id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error deleting file: %s' % req.text)
+
 
     def download(self, path: Optional[str]=None, create_dirs: bool=False):
         """Download this file"""

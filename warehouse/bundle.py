@@ -86,6 +86,14 @@ class WHBundle():
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
                     'error restoring bundle: %s' % req.text)
+    
+    def delete(self):
+        """Permanently deletes the bundle"""
+        with self.wh.session.delete('%s/bundles/%s' % (self.wh.url, self.id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error deleting bundle: %s' % req.text)
+
 
     def upload_file(self, f: bytes, name: Optional[str]=None) -> WHFile:
         """Uploads the passed file object to the bundle"""

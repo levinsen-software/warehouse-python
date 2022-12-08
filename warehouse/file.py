@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import cgi
 import shutil
 
 from warehouse.errors import WarehouseClientException
@@ -66,8 +67,18 @@ class WHFile():
         url = '%s/files/%s/download' % (self.wh.url, self.id)
         with self.wh.session.get(url, stream=True) as req:
             req.raise_for_status()
-            filename = req.headers['x-content-filename']
 
+            filename = "download"
+
+            try:
+                filename = req.headers['x-content-filename']
+            except KeyError:
+                try:
+                    header = cgi.parse_header(req.headers['content-disposition'])
+                    filename = header[1]['filename']
+                except (KeyError, IndexError):
+                    pass
+    
             if path is not None:
                 basename = os.path.basename(path)
                 if not basename:

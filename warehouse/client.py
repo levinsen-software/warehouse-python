@@ -131,6 +131,8 @@ class Client():
     def projects(self) -> List[WHProject]:
         """Returns a list of all accessible warehouse projects"""
         with self.session.get('%s/organizations' % self.url) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException('returned error: %s' % req.text)
             json_res = req.json()
             _projects: List[WHProject] = []
             for organization in json_res['organizations']:
@@ -217,6 +219,9 @@ class Client():
 
         files: List[WHFile] = []
         with self.session.post('%s/search/keys' % self.url, json=query_obj) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error searching: %s' % req.text)
             json_res = req.json()
 
             for f in json_res['results']:

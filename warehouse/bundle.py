@@ -21,11 +21,17 @@ class WHBundle():
     def get_properties(self) -> Dict[str, Any]:
         """Returns a dictionary with properties for the bundle"""
         with self.wh.session.get('%s/bundles/%s' % (self.wh.url, self.id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error getting properties: %s' % req.text)
             return req.json()
 
     def files(self) -> List[WHFile]:
         """Returns a list of the files contained in the bundle"""
         with self.wh.session.get('%s/bundles/%s' % (self.wh.url, self.id)) as req:
+            if req.status_code < 200 or req.status_code >= 300:
+                raise WarehouseClientException(
+                    'error getting files: %s' % req.text)
             json_res = req.json()
             files: List[WHFile] = []
             for f in json_res['files']:

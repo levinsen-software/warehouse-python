@@ -6,6 +6,7 @@ from warehouse.file import WHFile
 from warehouse.sorting import Sorting
 
 from typing import List, Union, Optional, Dict, Any
+import json
 
 
 class WHBundle():
@@ -101,14 +102,13 @@ class WHBundle():
                     'error deleting bundle: %s' % req.text)
 
 
-    def upload_file(self, f: bytes, name: Optional[str]=None) -> WHFile:
-        """Uploads the passed file object to the bundle"""
-        headers = {}
+    def upload_file(self, f: bytes, name: Optional[str]=None, props: Optional[Dict[str, Any]]={}) -> WHFile:
+        """Uploads the passed file object to the bundle""" 
         if name:
-            headers['x-file-property'] = 'filename=%s' % name
+            props['filename'] = name
 
         url = '%s/bundles/%s/files' % (self.wh.url, self.id)
-        with self.wh.session.post(url, data=f, headers=headers) as req:
+        with self.wh.session.post(url, files=dict(file=f, properties=json.dumps(props))) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
                     'error uploading file: %s' % req.text)

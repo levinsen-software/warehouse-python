@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import cgi
 import shutil
 
 from warehouse.errors import WarehouseClientException
@@ -76,11 +75,7 @@ class WHFile():
             try:
                 filename = req.headers['x-content-filename']
             except KeyError:
-                try:
-                    header = cgi.parse_header(req.headers['content-disposition'])
-                    filename = header[1]['filename']
-                except (KeyError, IndexError):
-                    pass
+                pass
     
             if path is not None:
                 basename = os.path.basename(path)

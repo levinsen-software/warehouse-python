@@ -1,5 +1,8 @@
 # Changelog for warehouse-python
 
+## 1.0.11 (Jul 10 2025)
+- Remove dependency on deprecated `cgi` module
+
 ## 1.0.10 (Feb 26 2024)
 - Use multi-part upload
 - Improved error handling for API methods

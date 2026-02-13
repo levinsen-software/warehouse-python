@@ -1,3 +1,4 @@
+import tempfile
 import warehouse as wh
 import helper
 
@@ -55,6 +56,20 @@ def test_find_files():
             bundle.upload_file(b'test', 'testfile')
         
         assert len(bundle.find_files('')) is 4
+
+def test_upload_file_object():
+    with helper.TemporaryProject(client) as p:
+        bundle = p.create_bundle({})
+
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(b'filedata')
+            tmp.flush()
+
+            with open(tmp.name, 'rb') as f:
+                bundle.upload_file(f, 'filename')
+
+        files = bundle.files()
+        assert len(files) == 1
 
 def test_find_file():
     with helper.TemporaryProject(client) as p:

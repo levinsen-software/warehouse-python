@@ -6,7 +6,9 @@ from warehouse.file import WHFile
 from warehouse.sorting import Sorting
 
 from typing import List, Union, Optional, Dict, Any
+import io
 import json
+import os
 
 
 class WHBundle():
@@ -102,12 +104,20 @@ class WHBundle():
                     'error deleting bundle: %s' % req.text)
 
 
-    def upload_file(self, f: bytes, name: Optional[str]=None, props: Optional[Dict[str, Any]]={}) -> WHFile:
+    def upload_file(self, f: Union[bytes, io.IOBase], name: Optional[str]=None, props: Optional[Dict[str, Any]]={}) -> WHFile:
         """Uploads the passed file object to the bundle"""
         if name:
             props['filename'] = name
 
-        part_headers = {'Content-Length': str(len(f))}
+        if isinstance(f, io.RawIOBase) or isinstance(f, io.BufferedIOBase):
+            size = os.fstat(f.fileno()).st_size
+            f.seek(0)
+        elif isinstance(f, bytes):
+            size = len(f)
+        else:
+            raise TypeError('f must be bytes or a binary file object')
+
+        part_headers = {'Content-Length': str(size)}
         file_part = (None, f, 'application/octet-stream', part_headers)
 
         url = '%s/bundles/%s/files' % (self.wh.url, self.id)

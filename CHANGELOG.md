@@ -1,8 +1,7 @@
 # Changelog for warehouse-python
 
-## 1.0.12 (Feb 13 2026)
+## 1.0.13 (Feb 13 2026)
 - Add Content-Length for multi-part uploads
-- Add checksum option to `upload_file`
 
 ## 1.0.11 (Jul 10 2025)
 - Remove dependency on deprecated `cgi` module

@@ -103,12 +103,15 @@ class WHBundle():
 
 
     def upload_file(self, f: bytes, name: Optional[str]=None, props: Optional[Dict[str, Any]]={}) -> WHFile:
-        """Uploads the passed file object to the bundle""" 
+        """Uploads the passed file object to the bundle"""
         if name:
             props['filename'] = name
 
+        part_headers = {'Content-Length': str(len(f))}
+        file_part = (None, f, 'application/octet-stream', part_headers)
+
         url = '%s/bundles/%s/files' % (self.wh.url, self.id)
-        with self.wh.session.post(url, files=dict(file=f, properties=json.dumps(props))) as req:
+        with self.wh.session.post(url, files=dict(file=file_part, properties=json.dumps(props))) as req:
             if req.status_code < 200 or req.status_code >= 300:
                 raise WarehouseClientException(
                     'error uploading file: %s' % req.text)

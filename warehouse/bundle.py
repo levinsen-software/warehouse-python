@@ -6,6 +6,8 @@ from warehouse.file import WHFile
 from warehouse.sorting import Sorting
 
 from typing import List, Union, Optional, Dict, Any
+import base64
+import hashlib
 import json
 
 
@@ -102,12 +104,15 @@ class WHBundle():
                     'error deleting bundle: %s' % req.text)
 
 
-    def upload_file(self, f: bytes, name: Optional[str]=None, props: Optional[Dict[str, Any]]={}) -> WHFile:
+    def upload_file(self, f: bytes, name: Optional[str]=None, props: Optional[Dict[str, Any]]={}, checksum: bool=False) -> WHFile:
         """Uploads the passed file object to the bundle"""
         if name:
             props['filename'] = name
 
         part_headers = {'Content-Length': str(len(f))}
+        if checksum:
+            h = base64.b64encode(hashlib.sha512(f).digest()).decode()
+            part_headers['X-Content-Sha512'] = h
         file_part = (None, f, 'application/octet-stream', part_headers)
 
         url = '%s/bundles/%s/files' % (self.wh.url, self.id)
